@@ -1,0 +1,53 @@
+name: Build EXE
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install requirements
+      run: |
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt
+        fi
+
+    - name: Install PyInstaller
+      run: pip install pyinstaller
+
+    - name: Build EXE with PyInstaller
+      run: |
+        # Try to detect main python file
+        MAIN_FILE=$(ls | grep -E 'main\.py$|app\.py$|game\.py$' | head -n1)
+        if [ -z "$MAIN_FILE" ]; then
+          echo "❌ Could not automatically detect main file. Please set MAIN_FILE variable."
+          exit 1
+        fi
+        # Collect mp3 files if any for --add-data
+        MP3S=$(find . -type f -name "*.mp3" | paste -sd ":" -)
+        ADD_DATA_ARG=""
+        if [[ ! -z "$MP3S" ]]; then
+          ADD_DATA_ARG="--add-data \"$MP3S:.\""
+        fi
+        # PyInstaller build
+        eval pyinstaller --onefile $ADD_DATA_ARG "$MAIN_FILE"
+
+    - name: Archive EXE
+      uses: actions/upload-artifact@v4
+      with:
+        name: exe-artifact
+        path: dist/*.exe
