@@ -1,11 +1,11 @@
 name: Build EXE
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-  workflow_dispatch:
 
 jobs:
   build:
@@ -31,20 +31,7 @@ jobs:
 
     - name: Build EXE with PyInstaller
       run: |
-        # Try to detect main python file
-        MAIN_FILE=$(ls | grep -E 'main\.py$|app\.py$|game\.py$' | head -n1)
-        if [ -z "$MAIN_FILE" ]; then
-          echo "❌ Could not automatically detect main file. Please set MAIN_FILE variable."
-          exit 1
-        fi
-        # Collect mp3 files if any for --add-data
-        MP3S=$(find . -type f -name "*.mp3" | paste -sd ":" -)
-        ADD_DATA_ARG=""
-        if [[ ! -z "$MP3S" ]]; then
-          ADD_DATA_ARG="--add-data \"$MP3S:.\""
-        fi
-        # PyInstaller build
-        eval pyinstaller --onefile $ADD_DATA_ARG "$MAIN_FILE"
+        pyinstaller --onefile --add-data "song.wav:." minecraft_adventure.py
 
     - name: Archive EXE
       uses: actions/upload-artifact@v4
