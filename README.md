@@ -40,3 +40,4 @@ This project is for educational and entertainment purposes only and is not affil
 
 Enjoy your adventure!
 
+## Minecraft Survival Mode: Choose Your Own Adventure
