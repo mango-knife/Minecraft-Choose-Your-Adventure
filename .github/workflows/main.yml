@@ -22,9 +22,10 @@ jobs:
 
     - name: Install requirements
       run: |
-        if exist requirements.txt (
+        if (Test-Path requirements.txt) {
           pip install -r requirements.txt
-        )
+        }
+      shell: pwsh
 
     - name: Install PyInstaller
       run: pip install pyinstaller
