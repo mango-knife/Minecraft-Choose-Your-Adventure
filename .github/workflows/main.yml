@@ -33,8 +33,25 @@ jobs:
       run: |
         pyinstaller --onefile --add-data "song.wav:." minecraft_adventure.py
 
-    - name: Archive EXE
+    - name: Archive build output (EXE or ZIP)
+      run: |
+        if ls dist/*.exe 1> /dev/null 2>&1; then
+          echo "Found EXE, uploading..."
+          echo "exe" > artifact_type.txt
+        elif ls dist/*.zip 1> /dev/null 2>&1; then
+          echo "Found ZIP, extracting..."
+          unzip -o dist/*.zip -d dist/
+          echo "zip" > artifact_type.txt
+        else
+          echo "❌ No supported artifact (.exe or .zip) found in dist/"
+          exit 1
+        fi
+
+    - name: Upload extracted EXE artifact
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: exe-artifact
-        path: dist/*.exe
+        path: |
+          dist/*.exe
+          artifact_type.txt
