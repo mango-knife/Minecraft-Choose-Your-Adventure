@@ -19,16 +19,6 @@ def typewriter(text, delay=0.003):
         time.sleep(delay)
     print()
 
-# Initialize the mixer and play background music
-# Initialize the mixer and play background music
-music_enabled = True
-try:
-    pygame.mixer.init()
-    background_sound = pygame.mixer.Sound('song.wav')
-    background_sound.play(loops=-1)
-except pygame.error:
-    music_enabled = False
-    print("[INFO] Audio device not found. Continuing without background music.")
 
 def loading_screen():
     typewriter("LOADING...")
